@@ -1,11 +1,84 @@
-<script>
-    fetch('https://raw.githubusercontent.com/EvgenMironov900/test-counter/main/counter.txt')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('viewCount').textContent = data.trim();
-        })
-        .catch(error => {
-            console.warn('Счётчик не загружен:', error);
-        });
-</script>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестовый счётчик просмотров</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            color: #2c3e50;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .counter {
+            font-size: 72px;
+            font-weight: bold;
+            color: #0d6efd;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .info {
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #28a745;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 12px;
+            color: #adb5bd;
+        }
+    </style>
+</head>
+<body>
+    <h1>👁️ Счётчик просмотров</h1>
+    <div class="counter" id="viewCount">0</div>
+    <div class="info">Обновляется при каждом открытии страницы</div>
+    <div class="status" id="statusMessage">⏳ Загрузка...</div>
+    <div class="footer">
+        <a href="https://github.com/EvgenMironov900/test-counter" target="_blank">Репозиторий</a> &nbsp;|&nbsp; Тестовый проект
+    </div>
+
+    <script>
+        const counterUrl = 'https://raw.githubusercontent.com/EvgenMironov900/test-counter/main/counter.txt';
+        const viewSpan = document.getElementById('viewCount');
+        const statusSpan = document.getElementById('statusMessage');
+
+        fetch(counterUrl)
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.text();
+            })
+            .then(data => {
+                const count = data.trim() || '0';
+                viewSpan.textContent = count;
+                statusSpan.textContent = '✅ Счётчик загружен';
+                statusSpan.style.color = '#28a745';
+            })
+            .catch(error => {
+                console.warn('Ошибка:', error);
+                viewSpan.textContent = '?';
+                statusSpan.textContent = '❌ Ошибка загрузки';
+                statusSpan.style.color = '#dc3545';
+            });
+    </script>
+</body>
+</html>
 
