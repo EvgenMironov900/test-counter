@@ -1,0 +1,32 @@
+name: Update Counter
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '*/5 * * * *'  # каждые 5 минут
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Increment counter
+        env:
+          TOKEN: ${{ secrets.VIEW_TOKEN }}
+        run: |
+          # Читаем текущее значение
+          COUNT=$(cat counter.txt || echo 0)
+          COUNT=$((COUNT + 1))
+          echo $COUNT > counter.txt
+          
+          # Коммитим и пушим
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add counter.txt
+          git commit -m "Automated views counter update" || echo "No changes"
+          git push

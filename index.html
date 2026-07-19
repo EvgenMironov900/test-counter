@@ -1,93 +1,11 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Счётчик просмотров</title>
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; text-align: center; background: #f8f9fa; }
-        .counter { font-size: 72px; font-weight: bold; color: #0d6efd; margin: 20px 0; }
-        .info { color: #6c757d; font-size: 14px; }
-        .status { margin-top: 20px; font-size: 14px; color: #28a745; }
-    </style>
-</head>
-<body>
-    <h1>👁️ Счётчик просмотров</h1>
-    <div class="counter" id="viewCounter">0</div>
-    <div class="info">Обновляется при каждом открытии страницы</div>
-    <div class="status" id="statusMessage"></div>
-
-    <script>
-        // Конфигурация
-        const REPO_OWNER = 'EvgenMironov900';
-        const REPO_NAME = 'test-counter';
-        const FILE_PATH = 'counter.txt';
-        // ВАШ ТОКЕН (замените на свой)
-        const TOKEN = '';
-
-        const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
-        const counterElement = document.getElementById('viewCounter');
-        const statusElement = document.getElementById('statusMessage');
-
-        function updateCounter() {
-            statusElement.textContent = '⏳ Читаем счётчик...';
-            statusElement.style.color = '#ffc107';
-
-            // 1. Читаем текущее значение
-            fetch(API_URL, {
-                headers: {
-                    'Authorization': `Bearer ${TOKEN}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            })
-            .then(response => {
-                if (!response.ok) throw new Error(`Ошибка чтения: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                // Декодируем содержимое (Base64 → текст)
-                const content = atob(data.content);
-                const currentCount = parseInt(content.trim()) || 0;
-                const newCount = currentCount + 1;
-                console.log(`Текущее: ${currentCount}, новое: ${newCount}`);
-
-                // 2. Обновляем файл
-                statusElement.textContent = '⏳ Обновляем счётчик...';
-                return fetch(API_URL, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${TOKEN}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: 'Update view counter',
-                        content: btoa(newCount.toString()),
-                        sha: data.sha
-                    })
-                });
-            })
-            .then(response => {
-                if (!response.ok) throw new Error(`Ошибка обновления: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                const content = atob(data.content);
-                counterElement.textContent = content.trim();
-                statusElement.textContent = '✅ Счётчик обновлён!';
-                statusElement.style.color = '#28a745';
-                console.log(`Новое значение: ${content.trim()}`);
-            })
-            .catch(error => {
-                console.error('Ошибка:', error);
-                statusElement.textContent = `❌ Ошибка: ${error.message}`;
-                statusElement.style.color = '#dc3545';
-            });
-        }
-
-        // Запускаем при загрузке страницы
-        window.addEventListener('load', updateCounter);
-    </script>
-</body>
-</html>
+<script>
+    fetch('https://raw.githubusercontent.com/EvgenMironov900/test-counter/main/counter.txt')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('viewCount').textContent = data.trim();
+        })
+        .catch(error => {
+            console.warn('Счётчик не загружен:', error);
+        });
+</script>
 
